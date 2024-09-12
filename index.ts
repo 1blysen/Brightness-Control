@@ -1,25 +1,27 @@
-import { Plugin } from 'vencord';
+import definePlugin from "@utils/types";
 
-export default class BrightnessControl extends Plugin {
-    constructor() {
-        super({
-            name: 'BrightnessControl',
-            description: 'Adjusts the brightness of the Discord interface.',
-            authors: ['Blysen'],
-            version: '1.0.0',
-        });
-    }
-
+export default definePlugin({
+    name: "BrightnessControl",
+    description: "Adjusts the brightness of the Discord interface.",
+    authors: ["Blysen"],
+    patches: [
+        {
+            find: ".app-3pQdFm { /* Atualize a classe conforme necessário */",
+            replacement: {
+                match: /filter: brightness\(70%\) !important;/,
+                replace: `
+                    filter: brightness(70%) !important;
+                `
+            }
+        }
+    ],
     start() {
         this.applyBrightness();
-    }
-
+    },
     stop() {
         this.removeBrightness();
-    }
-
+    },
     applyBrightness() {
-        // Adiciona o CSS para ajustar o brilho
         const style = document.createElement('style');
         style.id = 'brightness-control-style'; // ID para facilitar a remoção
         style.textContent = `
@@ -28,13 +30,11 @@ export default class BrightnessControl extends Plugin {
             }
         `;
         document.head.appendChild(style);
-    }
-
+    },
     removeBrightness() {
-        // Remove o CSS aplicado
         const style = document.getElementById('brightness-control-style');
         if (style) {
             style.remove();
         }
     }
-}
+});
