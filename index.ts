@@ -2,12 +2,12 @@ import definePlugin from "@utils/types";
 
 export default definePlugin({
     name: "BrightnessControl",
-    description: "Allows manual adjustment and toggling of the Discord interface brightness.",
-    authors: ["Blysen"],
+    description: "Allows manual adjustment, toggling, and persistent saving of the Discord interface brightness.",
+    authors: ["1blysen"],
     start() {
         this.createBrightnessControl();
-        this.applyBrightness(70); // Initial brightness value
-        this.setBrightnessEnabled(true); // Initially enabled
+        this.loadBrightnessSetting();
+        this.setBrightnessEnabled(this.isBrightnessEnabled()); // Load brightness state
     },
     stop() {
         this.removeBrightnessControl();
@@ -28,10 +28,29 @@ export default definePlugin({
         controlContainer.style.fontFamily = 'Arial, sans-serif';
         controlContainer.style.fontSize = '14px';
 
+        // Close Button
+        const closeButton = document.createElement('button');
+        closeButton.id = 'brightness-close-button';
+        closeButton.textContent = '×'; // Unicode for multiplication sign (X)
+        closeButton.style.position = 'absolute';
+        closeButton.style.top = '5px';
+        closeButton.style.right = '5px';
+        closeButton.style.width = '25px';
+        closeButton.style.height = '25px';
+        closeButton.style.backgroundColor = '#444';
+        closeButton.style.border = 'none';
+        closeButton.style.borderRadius = '50%';
+        closeButton.style.color = '#fff';
+        closeButton.style.fontSize = '18px';
+        closeButton.style.cursor = 'pointer';
+        closeButton.addEventListener('click', () => {
+            this.removeBrightnessControl();
+        });
+
         // Toggle Button
         const toggleButton = document.createElement('button');
         toggleButton.id = 'brightness-toggle-button';
-        toggleButton.textContent = 'Disable Brightness';
+        toggleButton.textContent = this.isBrightnessEnabled() ? 'Disable Brightness' : 'Enable Brightness';
         toggleButton.style.marginBottom = '10px';
         toggleButton.style.width = '100%';
         toggleButton.style.padding = '5px';
@@ -54,13 +73,15 @@ export default definePlugin({
         slider.type = 'range';
         slider.min = '0';
         slider.max = '100';
-        slider.value = '70'; // Initial brightness value
+        slider.value = localStorage.getItem('brightnessValue') || '70'; // Load saved value or default to 70
         slider.style.verticalAlign = 'middle';
         slider.style.cursor = 'pointer';
         slider.addEventListener('input', () => {
             this.applyBrightness(slider.value);
+            localStorage.setItem('brightnessValue', slider.value); // Save value to localStorage
         });
 
+        controlContainer.appendChild(closeButton);
         controlContainer.appendChild(toggleButton);
         controlContainer.appendChild(label);
         controlContainer.appendChild(slider);
@@ -93,11 +114,15 @@ export default definePlugin({
     setBrightnessEnabled(enabled) {
         const toggleButton = document.getElementById('brightness-toggle-button');
         if (enabled) {
-            this.applyBrightness(document.querySelector('input[type="range"]').value);
+            this.applyBrightness(localStorage.getItem('brightnessValue') || '70');
             toggleButton.textContent = 'Disable Brightness';
         } else {
             this.removeBrightness();
             toggleButton.textContent = 'Enable Brightness';
         }
+    },
+    isBrightnessEnabled() {
+        // Check if brightness is enabled based on the button text or localStorage
+        return localStorage.getItem('brightnessEnabled') === 'true';
     }
 });
