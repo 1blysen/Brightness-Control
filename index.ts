@@ -1,31 +1,35 @@
 import definePlugin from "@utils/types";
 
-// Assuming there's a method to inject settings UI into Vencord
 export default definePlugin({
     name: "BrightnessControl",
     description: "Integrates a brightness control into the Vencord settings menu.",
-    authors: ["1blysen"],
+    authors: ["Blysen"],
     start() {
         console.log("Starting BrightnessControl plugin...");
-        this.addSettingsPanel();
-        this.loadBrightnessSetting();
+        try {
+            this.addSettingsPanel();
+            this.loadBrightnessSetting();
+        } catch (error) {
+            console.error("Error while starting plugin:", error);
+        }
     },
     stop() {
         console.log("Stopping BrightnessControl plugin...");
-        this.removeSettingsPanel();
-        this.removeBrightness();
+        try {
+            this.removeSettingsPanel();
+            this.removeBrightness();
+        } catch (error) {
+            console.error("Error while stopping plugin:", error);
+        }
     },
     addSettingsPanel() {
         console.log("Adding brightness control to settings panel...");
-        
-        // Get the Vencord settings container element
         const settingsContainer = document.querySelector('.vencord-settings-container');
         if (!settingsContainer) {
             console.error("Settings container not found.");
             return;
         }
 
-        // Create the brightness control section
         const brightnessSection = document.createElement('div');
         brightnessSection.id = 'brightness-settings-section';
         brightnessSection.style.padding = '10px';
