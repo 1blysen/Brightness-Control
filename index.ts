@@ -4,7 +4,7 @@ import definePlugin from "@utils/types";
 export default definePlugin({
     name: "BrightnessControl",
     description: "Integrates a brightness control into the Vencord settings menu.",
-    authors: ["Blysen"],
+    authors: ["1blysen"],
     start() {
         console.log("Starting BrightnessControl plugin...");
         this.addSettingsPanel();
