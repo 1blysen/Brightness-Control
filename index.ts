@@ -1,5 +1,4 @@
 import { Plugin } from 'vencord';
-import { injectCSS, removeCSS } from 'vencord/utils';
 
 export default class BrightnessControl extends Plugin {
     constructor() {
@@ -21,19 +20,21 @@ export default class BrightnessControl extends Plugin {
 
     applyBrightness() {
         // Adiciona o CSS para ajustar o brilho
-        injectCSS(`
+        const style = document.createElement('style');
+        style.id = 'brightness-control-style'; // ID para facilitar a remoção
+        style.textContent = `
             .app-3pQdFm { /* Atualize a classe conforme necessário */
                 filter: brightness(70%) !important;
             }
-        `);
+        `;
+        document.head.appendChild(style);
     }
 
     removeBrightness() {
         // Remove o CSS aplicado
-        removeCSS(`
-            .app-3pQdFm { /* Atualize a classe conforme necessário */
-                filter: brightness(70%) !important;
-            }
-        `);
+        const style = document.getElementById('brightness-control-style');
+        if (style) {
+            style.remove();
+        }
     }
 }
